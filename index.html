@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>jeen-yuhs: A Kanye Trilogy</title>
     
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -12,6 +12,7 @@
             --bg-dark: #141414;
             --card-bg: #181818;
             --card-hover: #222222;
+            --card-active: #2a2a2a;
             --accent-red: #e50914;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
@@ -22,6 +23,8 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            /* Disable iOS tap highlight overlay */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -32,13 +35,16 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 24px 16px;
+            padding: 20px 16px;
+            /* Prevent horizontal overflow on mobile bounce scroll */
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .header {
             width: 100%;
             max-width: 980px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .show-title {
@@ -51,8 +57,8 @@
         .meta-tags {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
+            gap: 10px;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             margin-bottom: 12px;
         }
@@ -67,7 +73,7 @@
 
         .show-synopsis {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             line-height: 1.5;
             max-width: 800px;
         }
@@ -77,17 +83,21 @@
             max-width: 980px;
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 24px;
         }
 
-        /* Player Wrapper with Mask Overlay */
+        /* Player Wrapper with Mobile & iOS Hardware Acceleration */
         .player-wrapper {
             position: relative;
             width: 100%;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
             background-color: #000000;
+            /* Forces iOS Safari WebKit GPU rendering layer */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         .player-frame {
@@ -95,6 +105,7 @@
             padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
             height: 0;
             overflow: hidden;
+            width: 100%;
         }
 
         .player-frame iframe {
@@ -104,15 +115,17 @@
             width: 100%;
             height: 100%;
             border: 0;
+            /* Smooth iOS scrolling inside frames */
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Gradient mask to obscure the Google Drive header UI */
+        /* Gradient mask to obscure Google Drive header UI without blocking mobile controls */
         .drive-mask-top {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 55px;
+            height: 48px;
             z-index: 10;
             pointer-events: auto;
             background: linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0) 100%);
@@ -125,27 +138,34 @@
             letter-spacing: -0.2px;
         }
 
-        /* Episode Cards Grid */
+        /* Responsive Episode Grid */
         .episode-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
         }
 
         .ep-card {
             background-color: var(--card-bg);
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
             display: flex;
             flex-direction: column;
+            user-select: none;
         }
 
+        /* Hover for Desktop, Active Touch State for iOS/Mobile */
         .ep-card:hover {
             background-color: var(--card-hover);
             transform: translateY(-2px);
+        }
+
+        .ep-card:active {
+            transform: scale(0.98);
+            background-color: var(--card-active);
         }
 
         .ep-card.active {
@@ -153,7 +173,6 @@
             background-color: var(--card-hover);
         }
 
-        /* Local Thumbnail Image Styling */
         .thumbnail-wrapper {
             position: relative;
             width: 100%;
@@ -177,7 +196,7 @@
         }
 
         .ep-body {
-            padding: 16px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -208,8 +227,8 @@
 
         .details-box {
             background-color: var(--card-bg);
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 18px;
             font-size: 0.85rem;
             color: var(--text-secondary);
             display: flex;
@@ -219,6 +238,34 @@
 
         .details-box strong {
             color: var(--text-primary);
+        }
+
+        /* Specific Mobile Fine-Tuning for iPhone / Android Screens */
+        @media (max-width: 600px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .show-title {
+                font-size: 1.75rem;
+            }
+
+            .show-synopsis {
+                font-size: 0.88rem;
+            }
+
+            .drive-mask-top {
+                height: 40px; /* Slightly lower height to avoid obscuring mobile playback controls */
+            }
+
+            .episode-grid {
+                grid-template-columns: 1fr; /* Single column stack for clean mobile browsing */
+                gap: 14px;
+            }
+
+            .ep-body {
+                padding: 12px 14px;
+            }
         }
     </style>
 </head>
@@ -241,7 +288,7 @@
         <div class="player-wrapper">
             <div class="drive-mask-top"></div>
             <div class="player-frame">
-                <iframe id="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                <iframe id="video-player" src="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen playsinline></iframe>
             </div>
         </div>
 
@@ -314,12 +361,10 @@
         function loadEpisode(epNumber, shouldAutoplay = false) {
             const ep = episodes[epNumber];
             
-            // Switch video stream source with autoplay flag
             const iframe = document.getElementById('video-player');
             const autoplayParam = shouldAutoplay ? "?autoplay=1" : "";
             iframe.src = `https://drive.google.com/file/d/${ep.driveId}/preview${autoplayParam}`;
 
-            // Toggle active border state on cards
             for (let i = 1; i <= 3; i++) {
                 const card = document.getElementById(`btn-${i}`);
                 if (i === epNumber) {
@@ -330,7 +375,6 @@
             }
         }
 
-        // Load Episode 1 on page start
         window.onload = function() {
             loadEpisode(1, false);
         };
