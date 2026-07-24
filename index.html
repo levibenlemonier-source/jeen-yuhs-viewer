@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jeen-yuhs: A Kanye Trilogy</title>
+    
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <style>
+        :root {
+            --bg-dark: #141414;
+            --card-bg: #181818;
+            --card-hover: #222222;
+            --accent-red: #e50914;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --badge-border: #404040;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 980px;
+            margin-bottom: 24px;
+        }
+
+        .show-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .meta-tags {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            border: 1px solid var(--badge-border);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .show-synopsis {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 800px;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 980px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Player Wrapper with Mask Overlay */
+        .player-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+            background-color: #000000;
+        }
+
+        .player-frame {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .player-frame iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Gradient mask to obscure the Google Drive header UI */
+        .drive-mask-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 55px;
+            z-index: 10;
+            pointer-events: auto;
+            background: linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(20,20,20,0) 100%);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.2px;
+        }
+
+        /* Episode Cards Grid */
+        .episode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 20px;
+        }
+
+        .ep-card {
+            background-color: var(--card-bg);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ep-card:hover {
+            background-color: var(--card-hover);
+            transform: translateY(-2px);
+        }
+
+        .ep-card.active {
+            border-color: var(--accent-red);
+            background-color: var(--card-hover);
+        }
+
+        /* Local Thumbnail Image Styling */
+        .thumbnail-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000000;
+            overflow: hidden;
+        }
+
+        .thumbnail-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.2s ease;
+        }
+
+        .ep-card:hover .thumbnail-img {
+            opacity: 0.9;
+        }
+
+        .ep-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .ep-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ep-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .ep-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .ep-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .details-box {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .details-box strong {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1 class="show-title">jeen-yuhs: A Kanye Trilogy</h1>
+        <div class="meta-tags">
+            <span>2022</span>
+            <span>3 Episodes</span>
+            <span class="badge">TV-MA</span>
+            <span>Music</span>
+        </div>
+        <p class="show-synopsis">
+            The lives of an emerging superstar and a filmmaker intertwine in this intimate documentary series charting Kanye West's career, filmed over two decades.
+        </p>
+    </header>
+
+    <main class="main-container">
+        <div class="player-wrapper">
+            <div class="drive-mask-top"></div>
+            <div class="player-frame">
+                <iframe id="video-player" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <section>
+            <h2 class="section-title">Episodes</h2>
+            <div class="episode-grid">
+
+                <div class="ep-card active" id="btn-1" onclick="loadEpisode(1, true)">
+                    <div class="thumbnail-wrapper">
+                        <img src="ep1.webp" alt="act i: VISION thumbnail" class="thumbnail-img">
+                    </div>
+                    <div class="ep-body">
+                        <div class="ep-header">
+                            <span class="ep-name">1. act i: VISION</span>
+                            <span class="ep-time">1h 29m</span>
+                        </div>
+                        <p class="ep-description">
+                            After dazzling hip-hop players in Chicago, brilliant yet hungry producer Kanye West moves to NYC but struggles to get signed and claim the mic as an MC.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ep-card" id="btn-2" onclick="loadEpisode(2, true)">
+                    <div class="thumbnail-wrapper">
+                        <img src="ep2.webp" alt="act ii: PURPOSE thumbnail" class="thumbnail-img">
+                    </div>
+                    <div class="ep-body">
+                        <div class="ep-header">
+                            <span class="ep-name">2. act ii: PURPOSE</span>
+                            <span class="ep-time">1h 33m</span>
+                        </div>
+                        <p class="ep-description">
+                            Kanye hustles to establish his voice at the label. When a car crash and broken jaw threaten it all, the unstoppable artist turns pain into platinum.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ep-card" id="btn-3" onclick="loadEpisode(3, true)">
+                    <div class="thumbnail-wrapper">
+                        <img src="ep3.webp" alt="act iii: AWAKENING thumbnail" class="thumbnail-img">
+                    </div>
+                    <div class="ep-body">
+                        <div class="ep-header">
+                            <span class="ep-name">3. act iii: AWAKENING</span>
+                            <span class="ep-time">1h 37m</span>
+                        </div>
+                        <p class="ep-description">
+                            After multiple "College Dropout" Grammy wins, the documentary looks complete. But life, death and fame get in the way till two paths cross once more.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="details-box">
+            <div><strong>Starring:</strong> Ye</div>
+            <div><strong>Genres:</strong> Music, Hip-Hop, Documentary Series</div>
+            <div><strong>This show is...</strong> Captivating, Exciting, Documentary Series, Behind the Scenes, Hip Hop, Career, Entertainment, Music, TV</div>
+        </div>
+    </main>
+
+    <script>
+        const episodes = {
+            1: { driveId: "1t5gKJO0Ro8XMRxHBMrenXmjv-s-CZt6W" },
+            2: { driveId: "17mgGSW2Kd-TBZZkOaZ_CoxSe54JZSDB7" },
+            3: { driveId: "1R-6TlS2VowtQDXq6wcdHZiAqE5yAzm3C" }
+        };
+
+        function loadEpisode(epNumber, shouldAutoplay = false) {
+            const ep = episodes[epNumber];
+            
+            // Switch video stream source with autoplay flag
+            const iframe = document.getElementById('video-player');
+            const autoplayParam = shouldAutoplay ? "?autoplay=1" : "";
+            iframe.src = `https://drive.google.com/file/d/${ep.driveId}/preview${autoplayParam}`;
+
+            // Toggle active border state on cards
+            for (let i = 1; i <= 3; i++) {
+                const card = document.getElementById(`btn-${i}`);
+                if (i === epNumber) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            }
+        }
+
+        // Load Episode 1 on page start
+        window.onload = function() {
+            loadEpisode(1, false);
+        };
+    </script>
+
+</body>
+</html>
